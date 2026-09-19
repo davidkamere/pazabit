@@ -2,10 +2,10 @@ import { Group, Message } from "@/types";
 
 export const ESCALATION_THRESHOLD = 5;
 export const groups: Group[] = [
-  { id: "medical", tag: "#Medical", members: 18, status: "connected", description: "First aid, transport & supplies" },
-  { id: "security", tag: "#Security", members: 32, status: "connected", description: "Protection & safe passage" },
-  { id: "legal", tag: "#LegalAid", members: 9, status: "locked", description: "Rights & legal support" },
-  { id: "bridge", tag: "#RedCrossBridge", members: 14, status: "connected", description: "Humanitarian coordination" },
+  { id: "medical", tag: "#Medical", members: 18, status: "connected", description: "First aid, transport & supplies", hasPassword: false },
+  { id: "security", tag: "#Security", members: 32, status: "connected", description: "Protection & safe passage", hasPassword: false },
+  { id: "legal", tag: "#LegalAid", members: 9, status: "locked", description: "Rights & legal support", hasPassword: true },
+  { id: "bridge", tag: "#RedCrossBridge", members: 14, status: "connected", description: "Humanitarian coordination", hasPassword: false },
 ];
 
 export const initialMessages: Message[] = [
