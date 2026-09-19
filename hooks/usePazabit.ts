@@ -27,20 +27,24 @@ export function usePazabit() {
     const filtered = active
       ? messages.filter((message) => message.groups.includes(active.tag))
       : messages;
-    // Sort: upvoted messages first (descending upvotes, then newest first),
-    // then unvoted messages (newest first = original array order)
+    // Sort by net score (upvotes - downvotes):
+    // - Positive score first (descending score, then newest first)
+    // - Zero/negative score last (newest first = original array order)
     return [...filtered].sort((a, b) => {
-      const aUp = a.upvotes ?? 0;
-      const bUp = b.upvotes ?? 0;
+      const aScore = (a.upvotes ?? 0) - (a.downvotes ?? 0);
+      const bScore = (b.upvotes ?? 0) - (b.downvotes ?? 0);
 
-      if (aUp > 0 && bUp > 0) {
-        if (bUp !== aUp) return bUp - aUp;
-        // Same upvotes: lower index = newer message
+      const aPositive = aScore > 0;
+      const bPositive = bScore > 0;
+
+      if (aPositive && bPositive) {
+        if (bScore !== aScore) return bScore - aScore;
+        // Same score: lower index = newer message
         return filtered.indexOf(a) - filtered.indexOf(b);
       }
-      if (aUp > 0) return -1; // upvoted before unvoted
-      if (bUp > 0) return 1;
-      return 0; // both unvoted: preserve array order (newest first)
+      if (aPositive) return -1; // positive score before zero/negative
+      if (bPositive) return 1;
+      return 0; // both zero/negative: preserve array order (newest first)
     });
   }, [active, messages]);
 
