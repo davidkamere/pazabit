@@ -23,10 +23,26 @@ export function usePazabit() {
   const transport = useRef<PazabitTransport | null>(null);
 
   const active = groupList.find((group) => group.id === activeGroup);
-  const visibleMessages = useMemo(
-    () => (active ? messages.filter((message) => message.groups.includes(active.tag)) : messages),
-    [active, messages],
-  );
+  const visibleMessages = useMemo(() => {
+    const filtered = active
+      ? messages.filter((message) => message.groups.includes(active.tag))
+      : messages;
+    // Sort: upvoted messages first (descending upvotes, then newest first),
+    // then unvoted messages (newest first = original array order)
+    return [...filtered].sort((a, b) => {
+      const aUp = a.upvotes ?? 0;
+      const bUp = b.upvotes ?? 0;
+
+      if (aUp > 0 && bUp > 0) {
+        if (bUp !== aUp) return bUp - aUp;
+        // Same upvotes: lower index = newer message
+        return filtered.indexOf(a) - filtered.indexOf(b);
+      }
+      if (aUp > 0) return -1; // upvoted before unvoted
+      if (bUp > 0) return 1;
+      return 0; // both unvoted: preserve array order (newest first)
+    });
+  }, [active, messages]);
 
   const flash = (title: string, detail: string) => {
     const id = crypto.randomUUID();
