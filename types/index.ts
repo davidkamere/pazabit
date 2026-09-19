@@ -7,6 +7,7 @@ export type Group = {
   members: number;
   status: "connected" | "locked";
   description: string;
+  hasPassword: boolean;
 };
 export type Message = {
   id: string;

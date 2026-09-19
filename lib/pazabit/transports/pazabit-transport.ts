@@ -1,4 +1,4 @@
-import { PazabitEvent, PazabitMeshState } from "@/domain/pazabit-events";
+import { PazabitEvent, PazabitMeshState, AudioAttachment } from "@/domain/pazabit-events";
 
 export type MeshConnectionState = "connecting" | "connected" | "disconnected";
 export type PazabitTransport = {
@@ -8,4 +8,6 @@ export type PazabitTransport = {
     onConnection: (state: MeshConnectionState) => void,
     onFeedback: (message: { title: string; detail: string }) => void,
   ): () => void;
+  fetchAudio(messageId: string): Promise<AudioAttachment | null>;
+  verifyGroupPassword(groupId: string, password: string): Promise<boolean>;
 };
