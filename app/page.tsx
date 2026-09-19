@@ -1,0 +1,9 @@
+"use client";
+import { FeedHeader } from "@/components/feed/FeedHeader";
+import { MessageCard } from "@/components/feed/MessageCard";
+import { Composer } from "@/components/feed/Composer";
+import { TagModal } from "@/components/groups/TagModal";
+import { CreateGroupModal } from "@/components/groups/CreateGroupModal";
+import { ToastStack } from "@/components/feedback/ToastStack";
+import { usePazabit } from "@/hooks/usePazabit";
+export default function Home() { const app = usePazabit(); const tags = app.groupList.map(group => group.tag); return <main className="h-dvh overflow-hidden bg-black"><section className="flex h-full min-w-0 flex-col"><FeedHeader group={app.active} groups={app.groupList} activeGroup={app.activeGroup} onBack={() => app.setActiveGroup(null)} onSelect={app.setActiveGroup} onCreate={() => app.setCreatingGroup(true)}/><div className="scrollbar flex-1 overflow-y-auto">{app.messages.length > 0 && <p className="px-6 pt-5 text-[11px] tracking-wide text-[#5f675f]">mesh reports</p>}{app.messages.map(message => <MessageCard key={message.id} message={message} onVote={app.vote} onTag={app.openTagging}/>)}</div>{!app.active && <Composer text={app.composer.text} flag={app.composer.flag} tags={app.composer.tags} groupOptions={tags} onText={text => app.setComposer(current => ({ ...current, text }))} onFlag={flag => app.setComposer(current => ({ ...current, flag, tags: flag === "urgent" ? current.tags : [] }))} onTags={tags => app.setComposer(current => ({ ...current, tags }))} onSend={app.send}/>}</section>{app.tagging && <TagModal message={app.tagging} groups={app.groupList} selected={app.modalTags} onSelect={app.setModalTags} onClose={app.closeTagging} onConfirm={app.confirmTagging}/>} {app.creatingGroup && <CreateGroupModal onClose={() => app.setCreatingGroup(false)} onCreate={app.createGroup}/>}<ToastStack toasts={app.toasts}/></main>; }
