@@ -42,6 +42,7 @@ export default function Home() {
             flag={app.composer.flag}
             tags={app.composer.tags}
             groupOptions={tags}
+            topGroups={app.topGroups}
             onText={(text) => app.setComposer((current) => ({ ...current, text }))}
             onFlag={(flag) =>
               app.setComposer((current) => ({ ...current, flag, tags: flag === "urgent" ? current.tags : [] }))

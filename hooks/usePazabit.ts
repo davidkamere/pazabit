@@ -54,6 +54,22 @@ export function usePazabit() {
     window.setTimeout(() => setToasts((current) => current.filter((toast) => toast.id !== id)), 4500);
   };
 
+  // Top 5 groups by message count (for urgent tag suggestions)
+  // Falls back to first 5 groups from groupList if no messages exist
+  const topGroups = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const msg of messages) {
+      for (const tag of msg.groups) {
+        counts.set(tag, (counts.get(tag) ?? 0) + 1);
+      }
+    }
+    const sorted = Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([tag]) => tag);
+    if (sorted.length > 0) return sorted.slice(0, 5);
+    return groupList.slice(0, 5).map((g) => g.tag);
+  }, [messages, groupList]);
+
   const publish = (event: PazabitEvent) => transport.current?.publish(event);
 
   const fetchAudio = (messageId: string) =>
@@ -175,5 +191,6 @@ export function usePazabit() {
     passwordPrompt,
     verifyGroupPassword,
     cancelPasswordPrompt,
+    topGroups,
   };
 }

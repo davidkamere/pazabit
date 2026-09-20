@@ -1,13 +1,14 @@
 import { Flag } from "@/types";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 
 type Props = {
   text: string;
   flag: Flag;
   tags: string[];
   groupOptions: string[];
+  topGroups: string[];
   onText: (value: string) => void;
   onFlag: (flag: Flag) => void;
   onTags: (tags: string[]) => void;
@@ -19,6 +20,7 @@ export function Composer({
   flag,
   tags,
   groupOptions,
+  topGroups,
   onText,
   onFlag,
   onTags,
@@ -33,6 +35,7 @@ export function Composer({
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioMimeType, setAudioMimeType] = useState("audio/webm");
+  const [urgentSearch, setUrgentSearch] = useState("");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const startTimeRef = useRef<number>(0);
@@ -115,6 +118,16 @@ export function Composer({
     };
   }, []);
 
+  // Filter groups by search query
+  const filteredGroups = useMemo(() => {
+    if (!urgentSearch) return topGroups;
+    const lower = urgentSearch.toLowerCase();
+    return groupOptions.filter((tag) => tag.toLowerCase().includes(lower)).slice(0, 5);
+  }, [groupOptions, topGroups, urgentSearch]);
+
+  // Groups to display: search results if searching, otherwise topGroups
+  const displayGroups = urgentSearch ? filteredGroups : topGroups;
+
   const formatDuration = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -124,24 +137,7 @@ export function Composer({
   return (
     <div className="border-t border-line bg-black px-5 pb-[max(14px,env(safe-area-inset-bottom))] pt-3">
       <div className="mx-auto max-w-4xl">
-        {flag === "urgent" && (
-          <div className="mb-2 flex flex-wrap gap-1">
-            {groupOptions.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => toggleTag(tag)}
-                className={cn(
-                  "border px-2 py-1 text-[11px]",
-                  tags.includes(tag)
-                    ? "border-[#1779ff] bg-[#1779ff] text-black"
-                    : "border-[#1779ff] text-[#1779ff]",
-                )}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Audio preview */}
         {audioBlob && (
           <div className="mb-2 flex items-center gap-2 bg-[#1c2021] rounded-xl p-2">
             <button
@@ -168,6 +164,8 @@ export function Composer({
             </button>
           </div>
         )}
+
+        {/* Message input - highest priority */}
         <div className="flex items-end gap-3">
           <textarea
             value={text}
@@ -199,6 +197,8 @@ export function Composer({
             <Icon name="send" className="size-5" />
           </button>
         </div>
+
+        {/* Flag buttons - second priority */}
         <div className="flex gap-2 pb-1">
           <FlagButton
             label="normal"
@@ -218,6 +218,35 @@ export function Composer({
             onClick={() => onFlag("urgent")}
           />
         </div>
+
+        {/* Group search & toggles - only when urgent, lowest priority */}
+        {flag === "urgent" && displayGroups.length > 0 && (
+          <div className="mt-2">
+            <input
+              type="text"
+              value={urgentSearch}
+              onChange={(e) => setUrgentSearch(e.target.value)}
+              placeholder="Search groups..."
+              className="w-full rounded-xl bg-[#0b0b0b] px-3 py-2 text-sm text-[#1779ff] outline-none placeholder:text-[#626967] focus:ring-2 focus:ring-[#1779ff]"
+            />
+            <div className="mt-2 flex flex-wrap gap-1">
+              {displayGroups.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={cn(
+                    "border px-1.5 py-0 text-[10px]",
+                    tags.includes(tag)
+                      ? "border-[#1779ff] bg-[#1779ff] text-black"
+                      : "border-[#1779ff] text-[#1779ff]",
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
