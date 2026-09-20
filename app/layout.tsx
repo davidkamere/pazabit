@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-// CSS is loaded by Next.js at runtime and has no TypeScript declarations.
-// @ts-expect-error -- intentional side-effect import of a global stylesheet.
 import "./globals.css";
 
 export const metadata: Metadata = {
