@@ -2,7 +2,60 @@
 
 Safety reporting prototype with a Socket.IO relay that simulates Bluetooth mesh synchronization.
 
-## Run locally
+## Mobile Version
+
+The **Kotlin/Android implementation** is available at: **https://github.com/davidkamere/pazabitmobile**
+
+Built on the [bitchat Android](https://github.com/permissionlesstech/bitchat-android) mesh architecture, it uses Bluetooth LE + Wi-Fi Aware for true offline peer-to-peer mesh networking. Current status: **early-stage variant** — core mesh transport works; threat-report data model, submission UI, and mesh propagation are functional.
+
+| Feature | Web Demo (This Repo) | Mobile (pazabitmobile) |
+|---------|---------------------|------------------------|
+| Transport | Socket.IO (simulated relay) | BLE + Wi-Fi Aware (real mesh) |
+| Persistence | In-memory | In-memory (StateFlow) |
+| Encryption | None | Noise XX (X25519 + ChaCha20-Poly1305) |
+| Multi-hop | N/A | Up to 7 hops |
+| Offline capable | No | Yes |
+
+## Mobile Progress Summary 
+
+### ✅ Implemented
+- **Structured Threat Reports** — `SafetyEvent.Report` with body, severity (NONE/ONGOING/URGENT), private group targeting
+- **Voting** — Up/down votes on reports (`SafetyEvent.Vote`) with real-time tallies
+- **Escalation** — Urgent/highly-upvoted reports can be escalated to community groups (`SafetyEvent.Escalation`)
+- **Private Groups** — Create named groups (`#tag`) for targeted delivery (`SafetyEvent.GroupCreated`)
+- **Mesh Propagation** — Events encoded via binary codec (`PazabitEventCodec` v1) over bitchat mesh (BLE + Wi-Fi Aware, Noise XX encryption)
+- **Store-and-Forward** — In-memory merge + re-broadcast via mesh relay logic
+- **Compose UI** (`PazabitScreen`) — Composer with flag selector, group picker, live feed, vote rows, escalation, group drawer
+- **No Accounts/Servers** — Identity from ephemeral Noise static keys; fully decentralized
+
+### 🚧 Not Yet Implemented
+- Persistence across app restarts
+- Media attachments (photo/audio) in reports
+- Geohash location embedding
+- Collector-node aggregation + internet sync when connectivity returns
+- Background duty-cycling optimizations
+- Nostr/geohash channel fallback
+
+### Architecture
+```
+UI (Compose/MVVM)
+    │ creates SafetyEvent
+    ▼
+SafetyRepository (StateFlow)
+    │
+    ▼ encodes via PazabitEventCodec
+MeshService.sendPazabitEvent()
+    │
+    ├─ Bluetooth LE Mesh (multi-hop, up to 7)
+    └─ Wi-Fi Aware (higher bandwidth)
+        │
+        ▼ Noise XX encryption (X25519 + ChaCha20-Poly1305)
+    Peer devices
+```
+
+---
+
+## Run locally (Web Demo)
 
 ```bash
 npm install
@@ -11,18 +64,7 @@ npm run dev
 
 Open `http://localhost:3000` in two browser windows to see votes, messages, private-group creation, and report escalations synchronize live.
 
-## Features
-
-- **Mesh-style messaging** — In-memory Socket.IO relay simulates Bluetooth mesh broadcast
-- **Voice messages** — Record/play audio via MediaRecorder API
-- **Message scoring** — Net score (upvotes − downvotes) ordering; positive scores first
-- **Group feeds** — Switch between `#mesh` (all) and action groups
-- **Urgent tagging** — Mark reports `urgent`/`ongoing`; urgent reports require group targets
-- **Escalation (tagging)** — Community-verified reports can be routed to additional groups
-- **Private groups** — Create password-protected groups; join requires password
-- **Search** — Filter groups in feed header, tag modal, and composer
-
-## Architecture
+## Web Demo Architecture
 
 ```
 Web UI (React)
@@ -71,7 +113,7 @@ PazabitTransport (interface)
 - Monospace font, dark theme, lime accent
 - No Next.js dev indicator (`devIndicators: false`)
 
-## Development
+## Development (Web)
 
 ```bash
 npm run dev     # Start dev server (tsx watch + Next.js)
@@ -82,7 +124,7 @@ npm run start   # Production server
 
 ## Notes
 
-- Relay is in-memory — no durability (demo only)
+- Web relay is in-memory — no durability (demo only)
 - Passwords stored in server memory (demo only)
 - Anonymous node identities (`voterId: "anonymous-demo-node"`)
 - Android implementation would replace `SocketIoPazabitTransport` with `BitchatTransport`
