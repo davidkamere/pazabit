@@ -1,7 +1,88 @@
 import { ComponentProps } from "react";
 
-type IconName = "mesh" | "plus" | "menu" | "send" | "up" | "down" | "tag" | "play" | "pause" | "stop" | "loader" | "lock" | "close" | "back" | "voice" | "check" | "globe";
+type IconName =
+  | "mesh"
+  | "plus"
+  | "menu"
+  | "send"
+  | "up"
+  | "down"
+  | "tag"
+  | "play"
+  | "pause"
+  | "stop"
+  | "loader"
+  | "lock"
+  | "close"
+  | "back"
+  | "voice"
+  | "check"
+  | "globe";
 const paths: Record<IconName, React.ReactNode> = {
-  mesh: <><circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="m10.4 6.2-4.2 10M13.6 6.2l4.2 10M7 18h10"/></>, plus: <path d="M12 5v14M5 12h14"/>, menu: <path d="M4 7h16M4 12h16M4 17h16"/>, send: <path d="m21 3-7.5 18-3.7-7.8L3 9.5 21 3Zm-11.2 10.2L15 8"/>, up: <path d="m18 15-6-6-6 6"/>, down: <path d="m6 9 6 6 6-6"/>, tag: <path d="M20 13 13 20 4 11V4h7l9 9ZM8.5 8.5h.01"/>, play: <path d="m9 5 10 7-10 7V5Z"/>, pause: <path d="M7 5h4v14H7ZM13 5h4v14h-4Z"/>, stop: <rect x="7" y="5" width="10" height="10" rx="2"/>, loader: <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20" strokeDasharray="32 32" strokeLinecap="round" className="animate-spin" />, lock: <><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></>, close: <path d="m6 6 12 12M18 6 6 18"/>, back: <path d="m15 18-6-6 6-6"/>, voice: <><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6"/></>, check: <path d="m5 12 4 4L19 6"/>, globe: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></>
+  mesh: (
+    <>
+      <circle cx="12" cy="5" r="2" />
+      <circle cx="5" cy="18" r="2" />
+      <circle cx="19" cy="18" r="2" />
+      <path d="m10.4 6.2-4.2 10M13.6 6.2l4.2 10M7 18h10" />
+    </>
+  ),
+  plus: <path d="M12 5v14M5 12h14" />,
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  send: <path d="m21 3-7.5 18-3.7-7.8L3 9.5 21 3Zm-11.2 10.2L15 8" />,
+  up: <path d="m18 15-6-6-6 6" />,
+  down: <path d="m6 9 6 6 6-6" />,
+  tag: <path d="M20 13 13 20 4 11V4h7l9 9ZM8.5 8.5h.01" />,
+  play: <path d="m9 5 10 7-10 7V5Z" />,
+  pause: <path d="M7 5h4v14H7ZM13 5h4v14h-4Z" />,
+  stop: <rect x="7" y="5" width="10" height="10" rx="2" />,
+  loader: (
+    <path
+      d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20"
+      strokeDasharray="32 32"
+      strokeLinecap="round"
+      className="animate-spin"
+    />
+  ),
+  lock: (
+    <>
+      <rect x="5" y="10" width="14" height="10" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  close: <path d="m6 6 12 12M18 6 6 18" />,
+  back: <path d="m15 18-6-6 6-6" />,
+  voice: (
+    <>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" />
+    </>
+  ),
+  check: <path d="m5 12 4 4L19 6" />,
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+    </>
+  ),
 };
-export function Icon({ name, className, ...props }: { name: IconName } & ComponentProps<"svg">) { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{paths[name]}</svg>; }
+export function Icon({
+  name,
+  className,
+  ...props
+}: { name: IconName } & ComponentProps<"svg">) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      {...props}
+    >
+      {paths[name]}
+    </svg>
+  );
+}

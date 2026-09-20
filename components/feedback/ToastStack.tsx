@@ -1,3 +1,24 @@
 import { Toast } from "@/types";
 import { Icon } from "@/components/ui/Icon";
-export function ToastStack({ toasts }: { toasts: Toast[] }) { return <div className="pointer-events-none fixed bottom-5 right-5 z-40 w-[calc(100%-2.5rem)] max-w-sm space-y-2">{toasts.map(toast => <div key={toast.id} className="noise flex gap-3 rounded-xl border border-[#4f673b] bg-[#20291d] p-4 shadow-2xl"><div className="grid size-6 shrink-0 place-items-center rounded-full bg-lime text-ink"><Icon name="check" className="size-4"/></div><div><p className="text-sm font-bold text-white">{toast.title}</p><p className="mt-0.5 text-xs leading-5 text-[#c0cbb7]">{toast.detail}</p></div></div>)}</div>; }
+export function ToastStack({ toasts }: { toasts: Toast[] }) {
+  return (
+    <div className="pointer-events-none fixed bottom-5 right-5 z-40 w-[calc(100%-2.5rem)] max-w-sm space-y-2">
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          className="noise flex gap-3 rounded-xl border border-[#4f673b] bg-[#20291d] p-4 shadow-2xl"
+        >
+          <div className="grid size-6 shrink-0 place-items-center rounded-full bg-lime text-ink">
+            <Icon name="check" className="size-4" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-white">{toast.title}</p>
+            <p className="mt-0.5 text-xs leading-5 text-[#c0cbb7]">
+              {toast.detail}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
