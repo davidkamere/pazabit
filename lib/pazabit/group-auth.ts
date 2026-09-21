@@ -6,7 +6,7 @@ export class GroupPasswordStore {
   initialize(groups: { id: string; status: string }[]): void {
     for (const g of groups) {
       if (g.status === "locked") {
-        this.passwords.set(g.id, "demo123");
+        this.passwords.set(g.id, "test123");
       }
     }
   }

@@ -28,7 +28,7 @@ export function CreateGroupModal({
           <input
             value={tag}
             onChange={(event) => setTag(event.target.value)}
-            placeholder="#Evacuation"
+            placeholder="#Evacuation-0700222222"
             className="mt-2 w-full rounded-xl border border-line bg-[#1e2222] px-3 py-3 text-sm font-semibold text-white outline-none placeholder:text-[#626967] focus:border-lime"
           />
         </label>

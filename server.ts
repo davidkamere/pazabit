@@ -3,6 +3,7 @@ import next from "next";
 import { Server } from "socket.io";
 import { initialMessages, groups } from "./lib/constants";
 import { applyPazabitEvent } from "./lib/pazabit/reducer";
+import { groupPasswordStore } from "./lib/pazabit/group-auth";
 import type { PazabitEvent, PazabitMeshState, AudioAttachment, AudioStore } from "./domain/pazabit-events";
 import type { Group } from "./types";
 
@@ -14,14 +15,9 @@ const port = Number(process.env.PORT ?? 3000);
 let meshState: PazabitMeshState = { messages: initialMessages, groups };
 const socketVotes = new Map<string, Map<string, "up" | "down">>();
 const audioStore: AudioStore = new Map();
-const groupPasswords = new Map<string, string>(); // groupId -> password
 
-// Initialize passwords for seed groups
-for (const g of groups) {
-  if (g.status === "locked") {
-    groupPasswords.set(g.id, "demo123"); // demo password for locked seed groups
-  }
-}
+// Initialize group password store
+groupPasswordStore.initialize(groups);
 
 void app.prepare().then(() => {
   const httpServer = createServer(handler);
@@ -64,8 +60,8 @@ void app.prepare().then(() => {
         if (event.kind === "report" && event.audio) {
           audioStore.set(event.eventId, event.audio);
         }
-        if (event.kind === "group-created" && event.password) {
-          groupPasswords.set(event.group.id, event.password);
+        if (event.kind === "group-created" && (event as any).password) {
+          groupPasswordStore.set(event.group.id, (event as any).password);
         }
         meshState = applyPazabitEvent(meshState, event);
       }
@@ -88,9 +84,17 @@ void app.prepare().then(() => {
     });
 
     socket.on("pazabit:group:verify", ({ groupId, password }: { groupId: string; password: string }) => {
-      const stored = groupPasswords.get(groupId);
-      const ok = stored && stored === password;
+      const ok = groupPasswordStore.verify(groupId, password);
       socket.emit("pazabit:group:verify:response", { groupId, ok });
+    });
+
+    socket.on("pazabit:group:password", ({ groupId, password }: { groupId: string; password: string }) => {
+      groupPasswordStore.set(groupId, password);
+    });
+
+    socket.on("pazabit:group:has-password", ({ groupId }: { groupId: string }) => {
+      const hasPassword = groupPasswordStore.hasPassword(groupId);
+      socket.emit("pazabit:group:has-password:response", { groupId, hasPassword });
     });
 
     socket.on("pazabit:audio:request", (messageId: string) => {
